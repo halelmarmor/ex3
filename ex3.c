@@ -18,12 +18,28 @@
 #define HUMAN 1
 #define COMPUTER 2
 
-int isColumnFull(char[][COLS], int, int, int);
-
-int isBoardFull(char[][COLS], int, int);
-
-int isInBounds(int, int, int, int);
-
+int isColumnFull(char board[][COLS], int col) {
+        if (board[0][col] == TOKEN_P1 || board[0][col] == TOKEN_P2) {
+            printf ("Column %d is full. Choose another column.\n", col + 1);
+        }
+    return 0;
+}
+int isBoardFull(char board[][COLS], int col) {
+    for (col=0; col < COLS; col++) {
+        if (board[0][col] != TOKEN_P1 && board[0][col] != TOKEN_P2) {
+            return 0;
+        }
+    }
+    printf ("Board full and no winner. It's a tie!\n", col+1);
+    return 1;
+}
+int isInBounds(int col)
+{
+    if (col > COLS || col < 1) {
+        printf ("Invalid column. Choose between 1 and %d.\n", COLS);
+    }
+    return 0;
+}
 /* Return index of row where token will land, or -1 if column full */
 int getFreeRow(char[][COLS], int, int, int);
 
@@ -33,7 +49,18 @@ int makeMove(char[][COLS], int, int, int, char);
 int checkVictory(char[][COLS], int, int, int, int, char);
 
 /* Human player: asks repeatedly until a valid non-full column is chosen (0-based) */
-int humanChoose(char[][COLS], int, int);
+int humanChoose(char board[][COLS], int col) {
+    do {
+        printf("Enter column (1-%d): ", COLS);
+        scanf("%d",&col-1);
+    }
+    while (col);
+        isInBounds(col);
+        isColumnFull(board[][COLS], col);
+    //צריך לוודא שהמשתמש מכניס מספר ולא תו
+    printf("Invalid input. Enter a number.\n");
+    return 0;
+}
 
 /* Computer*/
 int computerChoose(char[][COLS], int, int, char, char);
