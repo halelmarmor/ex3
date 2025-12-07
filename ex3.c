@@ -1,3 +1,8 @@
+/******************
+Name: Halel Marmor
+ID: 211560065
+Assignment: ex3
+*******************/
 #include <stdio.h>
 
 #ifndef ROWS
@@ -19,9 +24,9 @@
 #define COMPUTER 2
 
 int isColumnFull(char board[][COLS], int col) {
-        if (board[0][col] == TOKEN_P1 || board[0][col] == TOKEN_P2) {
-            printf ("Column %d is full. Choose another column.\n", col + 1);
-            return 1;
+    if (board[0][col] == TOKEN_P1 || board[0][col] == TOKEN_P2) {
+        printf ("Column %d is full. Choose another column.\n", col + 1);
+        return 1;
         }
     return 0;
 }
@@ -51,7 +56,6 @@ int getFreeRow(char board[][COLS], int rows, int cols, int col) {
     }
     return -1;
 }
-
 /* Place token in column (0-based). Return row index or -1 if illegal */
 int makeMove(char board[][COLS], int col, char token) {
     for (int row = ROWS-1; row >= 0; row--) {
@@ -61,8 +65,7 @@ int makeMove(char board[][COLS], int col, char token) {
             }
         }
     return -1;
-    }
-
+}
 int checkSequence(char board[][COLS], int rows, int cols, int lastRow, int lastCol, char token, int length) {
     int count, r, c;
     //horizontal check
@@ -82,7 +85,8 @@ int checkSequence(char board[][COLS], int rows, int cols, int lastRow, int lastC
     //diagonal from left to right check
     count = 0;
     r = lastRow; c = lastCol;
-    while (r > 0 && c > 0) {r--; c--;}
+    while (r > 0 && c > 0)
+        {r--; c--;}
     while (r < rows && c < cols) {
        if (board[r][c] == token) count++;
         else count = 0;
@@ -92,7 +96,8 @@ int checkSequence(char board[][COLS], int rows, int cols, int lastRow, int lastC
     //diagonal from right to left check
     count = 0;
     r = lastRow; c = lastCol;
-    while (r > 0 && c < cols -1) {r--; c++;}
+    while (r > 0 && c < cols -1)
+        {r--; c++;}
     while (r < rows && c >= 0) {
         if (board[r][c] == token) count++;
         else count = 0;
@@ -108,8 +113,7 @@ int checkVictory (char board[][COLS], int rows, int cols, int lastRow, int lastC
 int humanChoose(char board[][COLS], int playerNumber) {
     int col;
     while (1) {
-        printf ("Player %d (%c) turn.\nEnter column (1-%d): ",
-            playerNumber, (playerNumber ==1 ? TOKEN_P1 : TOKEN_P2), COLS);
+        printf("Enter column (1-%d):  ", COLS);
         if (scanf("%d",&col) != 1) {
             printf("Invalid input. Enter a number.\n");
             while (getchar() != '\n');
@@ -121,12 +125,34 @@ int humanChoose(char board[][COLS], int playerNumber) {
         return col-1;
     }
 }
-
-/* Computer*/
+void columnOrder (int cols, int order []) {
+    int index = 0;
+    if (cols % 2 == 0) {
+        int left = cols/2 - 1;
+        int right = cols/2;
+        while (left >= 0 || right < cols) {
+            if (left >= 0) order[index++] = left--;
+            if (right < cols) order[index++] = right++;
+        }
+    }else {
+        int center = cols/2;
+        int left = center - 1;
+        int right = center + 1;
+        order[index++] = center;
+        while (left >= 0 || right < cols) {
+            if (left >= 0) order[index++] = left--;
+            if (right < cols) order[index++] = right++;
+        }
+    }
+}
+/*Computer*/
 int computerChoose(char board[][COLS], int playerNumber, int opponentNumber, char myToken, char oppToken) {
     int row, col;
+    int columnOrderArr[COLS];
+    columnOrder (COLS, columnOrderArr);
     //winning move
-    for (col = 0; col < COLS; col++) {
+    for (int i = 0; i < COLS; i++) {
+        col = columnOrderArr[i];
         row = getFreeRow(board, ROWS, COLS, col);
         if (row == -1) continue;
         board[row][col] = myToken;
@@ -137,7 +163,8 @@ int computerChoose(char board[][COLS], int playerNumber, int opponentNumber, cha
         board[row][col] = EMPTY;
     }
     //blocking the opponent
-    for (col = 0; col < COLS; col++) {
+    for (int i = 0; i < COLS; i++) {
+        col = columnOrderArr[i];
         row = getFreeRow(board, ROWS, COLS, col);
         if (row == -1) continue;
         board[row][col] = oppToken;
@@ -148,7 +175,8 @@ int computerChoose(char board[][COLS], int playerNumber, int opponentNumber, cha
         board[row][col] = EMPTY;
     }
     //creating a sequence of three
-    for (col = 0; col < COLS; col++) {
+    for (int i = 0; i < COLS; i++) {
+        col = columnOrderArr[i];
         row = getFreeRow(board, ROWS, COLS, col);
         if (row == -1) continue;
         board[row][col] = myToken;
@@ -159,7 +187,8 @@ int computerChoose(char board[][COLS], int playerNumber, int opponentNumber, cha
         board[row][col] = EMPTY;
     }
     //blocking the opponent's sequence of three
-    for (col = 0; col < COLS; col++) {
+    for (int i = 0; i < COLS; i++) {
+        col = columnOrderArr[i];
         row = getFreeRow(board, ROWS, COLS, col);
         if (row == -1) continue;
         board[row][col] = oppToken;
@@ -170,18 +199,10 @@ int computerChoose(char board[][COLS], int playerNumber, int opponentNumber, cha
         board[row][col] = EMPTY;
     }
     //arbitrary ordering rule
-    int columnOrder[COLS];
-    int index = 0;
-    int center = (COLS-1)/2;
-    columnOrder[index++] = center;
-    for (int shift = 1; index < COLS; shift++) {
-        if (center - shift >= 0) columnOrder[index++] = center - shift;
-        if (center + shift < COLS && index < COLS) columnOrder[index++] = center + shift;
-    }
     for (int i = 0; i < COLS; i++) {
-    col = columnOrder[i];
-    row = getFreeRow(board, ROWS, COLS, col);
-    if (row != -1) return col;
+        col = columnOrderArr[i];
+        row = getFreeRow(board, ROWS, COLS, col);
+        if (row != -1) return col;
     }
     return -1;
 }
@@ -193,11 +214,13 @@ void runConnectFour(char board[][COLS], int rows, int cols, int p1Type, int p2Ty
     char token;
     while (1) {
         token = (currentPlayer == 1) ? TOKEN_P1 : TOKEN_P2;
+        printf ("Player %d (%c) turn.\n", currentPlayer, token);
         if ((currentPlayer == 1 && p1Type == HUMAN) || (currentPlayer == 2 && p2Type == HUMAN)) {
            col =  humanChoose(board, currentPlayer);
         } else {
             col = computerChoose(board, currentPlayer,(currentPlayer == 1 ? 2 : 1),
                 token, (currentPlayer == 1 ? TOKEN_P2 : TOKEN_P1));
+
         }
         row = makeMove(board, col, token);
         printBoard(board, rows, cols);
