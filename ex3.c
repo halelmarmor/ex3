@@ -219,7 +219,7 @@ void runConnectFour(char board[][COLS], int rows, int cols, int p1Type, int p2Ty
            col =  humanChoose(board);
         } else {
             col = computerChoose(board, token, (currentPlayer == 1 ? TOKEN_P2 : TOKEN_P1));
-
+            printf ("Computer chose column %d", col+1);
         }
         row = makeMove(board, col, token);
         printBoard(board, rows, cols);
