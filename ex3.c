@@ -113,7 +113,7 @@ int checkVictory (char board[][COLS], int rows, int cols, int lastRow, int lastC
 int humanChoose(char board[][COLS], int playerNumber) {
     int col;
     while (1) {
-        printf("Enter column (1-%d):    ", COLS);
+        printf("Enter column (1-%d): ", COLS);
         if (scanf("%d",&col) != 1) {
             printf("Invalid input. Enter a number.\n");
             while (getchar() != '\n');
