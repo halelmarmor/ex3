@@ -69,41 +69,72 @@ int makeMove(char board[][COLS], int col, char token) {
 int checkSequence(char board[][COLS], int rows, int cols, int lastRow, int lastCol, char token, int length) {
     int count, r, c;
     //horizontal check
-    count = 0;
-    for (c=0; c < cols; c++) {
-        if (board[lastRow][c] == token) count++;
-        else count = 0;
-        if (count >= length) return 1;
+    count = 1;
+    //left
+    c = lastCol - 1;
+    while (c >= 0 && board[lastRow][c] == token) {
+        count++;
+        c--;
     }
-    //verticl check
-    count = 0;
-    for (r=0; r < rows; r++) {
-        if (board[r][lastCol] == token) count++;
-        else count = 0;
-        if (count >= length) return 1;
+    //right
+    c = lastCol + 1;
+    while (c < cols && board[lastRow][c] == token) {
+        count++;
+        c++;
     }
+    if (count >= length) return 1;
+    //vertical check
+    count = 1;
+    //up
+    r = lastRow - 1;
+    while (r >= 0 && board[r][lastCol] == token) {
+        count++;
+        r--;
+    }
+    //down
+    r = lastRow + 1;
+    while (r < rows && board[r][lastCol] == token) {
+        count++;
+        r++;
+    }
+    if (count >= length) return 1;
     //diagonal from left to right check
-    count = 0;
-    r = lastRow; c = lastCol;
-    while (r > 0 && c > 0)
-        {r--; c--;}
-    while (r < rows && c < cols) {
-       if (board[r][c] == token) count++;
-        else count = 0;
-        if (count >= length) return 1;
-        r++; c++;
+    count = 1;
+    //up left
+    r = lastRow - 1; c = lastCol - 1;
+    while (r >= 0 && c >= 0 && board[r][c] == token) {
+        count++;
+        r--;
+        c--;
     }
+    //down right
+    r = lastRow + 1; c = lastCol + 1;
+    while (r < rows && c < cols && board[r][c] == token) {
+        count++;
+        r++;
+        c++;
+    }
+    if (count >= length) return 1;
     //diagonal from right to left check
-    count = 0;
-    r = lastRow; c = lastCol;
-    while (r > 0 && c < cols -1)
-        {r--; c++;}
-    while (r < rows && c >= 0) {
-        if (board[r][c] == token) count++;
-        else count = 0;
-        if (count >= length) return 1;
-        r++; c--;
+    count = 1;
+    //up right
+    r = lastRow - 1;
+    c = lastCol + 1;
+    while (r >= 0 && c < cols && board[r][c] == token) {
+        count++;
+        r--;
+        c++;
     }
+    //down left
+    r = lastRow + 1;
+    c = lastCol - 1;
+    while (r < rows && c >= 0 && board[r][c] == token) {
+        count++;
+        r++;
+        c--;
+    }
+    if (count >= length) return 1;
+    //no sequence found
     return 0;
 }
 int checkVictory (char board[][COLS], int rows, int cols, int lastRow, int lastCol, char token) {
