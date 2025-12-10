@@ -58,7 +58,7 @@ int getFreeRow(char board[][COLS], int rows, int col) {
 }
 /* Place token in column (0-based). Return row index or -1 if illegal */
 int makeMove(char board[][COLS], int col, char token) {
-    for (int row = ROWS-1; row >= 0; row--) {
+    for (int row = ROWS - 1; row >= 0; row--) {
         if (board[row][col] == EMPTY) {
             board[row][col] = token;
             return row;
@@ -66,76 +66,42 @@ int makeMove(char board[][COLS], int col, char token) {
         }
     return -1;
 }
+int countDirection(char board[][COLS], int rows, int cols, int startRow, int startCol, int dRow, int dCol, char token) {
+    int r = startRow + dRow;
+    int c = startCol + dCol;
+    int count = 0;
+    while (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] == token) {
+        count++;
+        r += dRow;
+        c += dCol;
+    }
+    return count;
+}
+int checkDirection(char board[][COLS], int rows, int cols, int row, int col, char token, int dRow1, int dCol1,
+    int dRow2, int dCol2, int length) {
+    int count = 1;
+    count += countDirection(board, rows, cols, row, col, dRow1, dCol1, token);
+    count += countDirection(board, rows, cols, row, col, dRow2, dCol2, token);
+    return (count >= length);
+}
+int checkHorizontal(char board[][COLS], int rows, int cols, int row, int col, char token, int length) {
+    return checkDirection(board, rows, cols, row, col, token, 0, -1, 0 ,1, length);
+}
+int checkVertical(char board[][COLS], int rows, int cols, int row, int col, char token, int length) {
+    return checkDirection(board, rows, cols, row, col, token, -1, 0, 1 ,0, length);
+}
+int checkDiagonal1(char board[][COLS], int rows, int cols, int row, int col, char token, int length) {
+    return checkDirection(board, rows, cols, row, col, token, -1, -1, 1 ,1, length);
+}
+int checkDiagonal2(char board[][COLS], int rows, int cols, int row, int col, char token, int length) {
+    return checkDirection(board, rows, cols, row, col, token, -1, 1, 1 ,-1, length);
+}
 int checkSequence(char board[][COLS], int rows, int cols, int lastRow, int lastCol, char token, int length) {
-    int count, r, c;
-    //horizontal check
-    count = 1;
-    //left
-    c = lastCol - 1;
-    while (c >= 0 && board[lastRow][c] == token) {
-        count++;
-        c--;
-    }
-    //right
-    c = lastCol + 1;
-    while (c < cols && board[lastRow][c] == token) {
-        count++;
-        c++;
-    }
-    if (count >= length) return 1;
-    //vertical check
-    count = 1;
-    //up
-    r = lastRow - 1;
-    while (r >= 0 && board[r][lastCol] == token) {
-        count++;
-        r--;
-    }
-    //down
-    r = lastRow + 1;
-    while (r < rows && board[r][lastCol] == token) {
-        count++;
-        r++;
-    }
-    if (count >= length) return 1;
-    //diagonal from left to right check
-    count = 1;
-    //up left
-    r = lastRow - 1; c = lastCol - 1;
-    while (r >= 0 && c >= 0 && board[r][c] == token) {
-        count++;
-        r--;
-        c--;
-    }
-    //down right
-    r = lastRow + 1; c = lastCol + 1;
-    while (r < rows && c < cols && board[r][c] == token) {
-        count++;
-        r++;
-        c++;
-    }
-    if (count >= length) return 1;
-    //diagonal from right to left check
-    count = 1;
-    //up right
-    r = lastRow - 1;
-    c = lastCol + 1;
-    while (r >= 0 && c < cols && board[r][c] == token) {
-        count++;
-        r--;
-        c++;
-    }
-    //down left
-    r = lastRow + 1;
-    c = lastCol - 1;
-    while (r < rows && c >= 0 && board[r][c] == token) {
-        count++;
-        r++;
-        c--;
-    }
-    if (count >= length) return 1;
-    //no sequence found
-    return 0;
+    return
+     checkHorizontal(board, rows, cols, lastRow, lastCol, token, length) ||
+     checkVertical(board, rows, cols, lastRow, lastCol, token, length) ||
+     checkDiagonal1(board, rows, cols, lastRow, lastCol, token, length) ||
+     checkDiagonal2(board, rows, cols, lastRow, lastCol, token, length);
 }
 int checkVictory (char board[][COLS], int rows, int cols, int lastRow, int lastCol, char token) {
     return checkSequence(board, rows, cols, lastRow, lastCol, token, CONNECT_N);
